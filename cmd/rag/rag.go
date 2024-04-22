@@ -28,13 +28,14 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-const theQuestion = "what does GOTOOLCHAIN mean in go?"
+var theQuestion = "what is inertia?"
 
 func main() {
 	dbPath := flag.String("db", "chunks.db", "path to DB with chunks")
 	doCalculate := flag.Bool("calculate", false, "calculate embeddings and update DB")
 	doAnswer := flag.Bool("answer", false, "answer question (DB must have embeddings already)")
 	flag.Parse()
+	theQuestion = flag.Arg(0)
 
 	if *doAnswer {
 		answerQuestion(*dbPath)
@@ -93,18 +94,18 @@ func answerQuestion(dbPath string) {
 			log.Fatal(err)
 		}
 
-		fmt.Printf("path: %s, content: %d, embedding: %d\n", path, len(content), len(embedding))
+		log.Printf("path: %s, content: %d, embedding: %d\n", path, len(content), len(embedding))
 
 		contentEmb := decodeEmbedding(embedding)
 		score := cosineSimilarity(qEmb, contentEmb)
 		scores = append(scores, scoreRecord{path, score, content})
-		fmt.Println(path, score)
+		log.Println(path, score)
 	}
 	if err = rows.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(len(scores))
+	log.Println(len(scores))
 	slices.SortFunc(scores, func(a, b scoreRecord) int {
 		// The scores are in the range [0, 1], so scale them to get non-zero
 		// integers for comparison.
@@ -125,7 +126,7 @@ Information:
 
 Question: %v`, contextInfo, theQuestion)
 
-	fmt.Println("Query:\n", query)
+	log.Println("Query:\n", query)
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -140,12 +141,12 @@ Question: %v`, contextInfo, theQuestion)
 	)
 	checkErr(err)
 
-	fmt.Println("Got response, ID:", resp.ID)
+	log.Println("Got response, ID:", resp.ID)
 	b, err := json.MarshalIndent(resp, "", "  ")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(string(b))
+	log.Println(string(b))
 
 	choice := resp.Choices[0]
 	fmt.Println(choice.Message.Content)
