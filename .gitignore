@@ -1,2 +1,3 @@
 cmd/rag/rag
+cmd/chunker/chunker
 data/private/*
