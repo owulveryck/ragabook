@@ -24,7 +24,8 @@ import (
 	"slices"
 
 	"github.com/chewxy/math32"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/glebarez/go-sqlite"
+
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -52,7 +53,7 @@ func answerQuestion(dbPath string) {
 	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 
 	// Connect to the SQLite database
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite", dbPath)
 	checkErr(err)
 	defer db.Close()
 

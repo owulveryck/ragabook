@@ -17,7 +17,8 @@ import (
 	"os"
 	"path/filepath"
 
-	_ "github.com/mattn/go-sqlite3"
+	//_ "github.com/mattn/go-sqlite3"
+	_ "github.com/glebarez/go-sqlite"
 	"github.com/pkoukk/tiktoken-go"
 )
 
@@ -40,7 +41,7 @@ func main() {
 	outDb := flag.String("outdb", "chunks.db", "filename for sqlite DB for output")
 	flag.Parse()
 
-	db, err := sql.Open("sqlite3", *outDb)
+	db, err := sql.Open("sqlite", *outDb)
 	checkErr(err)
 
 	_, err = db.Exec(fmt.Sprintf(tableSql, tableName))
